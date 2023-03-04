@@ -1,5 +1,4 @@
 import random
-import time
 
 class Grid:
     def __init__(self, rows, lines, mines,):
@@ -46,30 +45,30 @@ class Player:
         self.actual_grid = []
         self.actual_visual_grid = []
         self.played_possitions = []
-
+        self.game_over = False
 
     def player_visual_grid(self,grid, rows, lines):
         actual_line = 1
+        visual_grid = []
         for row in range(rows + 1):
-            self.actual_visual_grid.append(row)
+            visual_grid.append(("\033[36m " +str(row)+ "\033[36m"))
         for i, item in enumerate(grid):
             if i % lines == 0:
-                self.actual_visual_grid.append(actual_line)
+                visual_grid.append(("\033[36m" + str(actual_line) + "\033[36m"))
                 actual_line += 1
                 if i in self.played_possitions:
-                    self.actual_visual_grid.append(item)
+                    visual_grid.append((" \033[32m" +str(item) + "\033[32m"))
                 else:
-                    self.actual_visual_grid.append("<>")
+                    visual_grid.append("\033[33m[ ]\033[33m")
             elif i in self.played_possitions:
-                self.actual_visual_grid.append(item)
+                visual_grid.append(("\033[32m " +str(item)) + "\033[32m")
             else:   
-                self.actual_visual_grid.append("<>")
-        print(self.actual_visual_grid)
-        print(self.played_possitions)
-        for i, item in enumerate(self.actual_visual_grid):
-            print(item, end= "\t")
+                visual_grid.append("\033[33m[ ]\033[33m")
+        for i, item in enumerate(visual_grid):
+            print((item), end= "\t")
             if (i+1) % (rows + 1)  == 0:
                 print("\n")
+        print("\n")
         return
 
     def player_actual_grid(self, grid):
@@ -82,22 +81,18 @@ class Player:
     def input_verification(self,inputed_row, inputed_line, grid, rows, lines):
         possition_index = (((inputed_line - 1) * rows) + inputed_row - 1)
         possition_value = grid[possition_index]
-        print(possition_index)
-        print(possition_value)
         if type(possition_value) == str:
-            actual_player.played_possitions.append(possition_index)
-            actual_player.player_visual_grid(grid,rows,lines)
-            print("You blasted mine! Game over")
+            self.played_possitions.append(possition_index)
+            self.player_visual_grid(grid,rows,lines)
+            print("\033[31mYou blasted mine! Game over\n\033[31m")
+            self.game_over = True
         elif grid[possition_index] == 0:
             revealed = []
             revealed.append(possition_index)
             while revealed:
-                print("revealed " + str(revealed))
                 possition = revealed.pop(0)
-                print("reveal" + str(possition))
                 neighbors = []
                 clear_neighbors = []
-                print("possition" + str(possition))
                 if possition % lines + 1 == 0:
                     neighbors = [possition - 1, possition - lines, possition - lines - 1, possition + lines - 1, possition + lines]
                 elif possition % lines + 1 == 1:
@@ -107,12 +102,16 @@ class Player:
                 for clear_neighbor in neighbors:
                     if clear_neighbor < len(grid) and clear_neighbor >= 0:
                         clear_neighbors.append(clear_neighbor)
-                print(clear_neighbors)
                 for neighbor in clear_neighbors:
                     if grid[neighbor] == 0 and neighbor not in self.played_possitions:
                         self.played_possitions.append(neighbor)
                         revealed.append(neighbor)
-            actual_player.player_visual_grid(grid,rows,lines)
+            self.player_visual_grid(grid,rows,lines)
+            print("\033[0m\033[0mPossition on row "+ str(inputed_row) + " and line " + str(inputed_line) + " is : " + str(grid[possition_index])+ "\n")
+        elif grid[possition_index] > 0:
+            self.played_possitions.append(possition_index)
+            self.player_visual_grid(grid,rows,lines)
+            print("\033[0m\033[0mPossition on row "+ str(inputed_row) + " and line " + str(inputed_line) + " is : " + str(grid[possition_index])+ "\n")
         return
 
 
@@ -126,18 +125,57 @@ print("Welcome to Minseweeper game")
 player_nick = input("What's your nick?\n")
 actual_player = Player(player_nick)
 print("How big grid you wanna create?\n")
-rows = int(input("How many rows:\n"))
-lines = int(input("How many lines:\n"))
-mines = int(input("With how many mines:\n"))
+while True:
+    try:
+        rows = int(input("How many rows:\n"))
+        break
+    except ValueError:
+        print("Input must be number")
+while True:
+    try:
+        lines = int(input("How many lines:\n"))
+        break
+    except ValueError:
+        print("Input must be number")
+
+while True:
+    try:
+        mines = int(input("With how many mines:\n"))
+        break
+    except ValueError:
+        print("Input must be number")
 player_possition = 0
 my_grid = Grid(rows,lines,mines)
 my_grid.create_grid()
 my_grid.create_visual_grid()
 actual_player.player_actual_grid(my_grid.visual_grid)
-
-print("What possition you want to sweep?")
-inputed_row = int(input("Enter row"))
-inputed_line = int(input("Enter line"))
-
-
-actual_player.input_verification(inputed_row,inputed_line,my_grid.visual_grid,my_grid.rows,my_grid.lines)
+actual_player.player_visual_grid(my_grid.visual_grid,my_grid.rows,my_grid.lines)
+def game():
+    if (len(actual_player.played_possitions) + my_grid.mines) == (len(my_grid.visual_grid)):
+        return print("\n\033[35mCongatulations!!! You won!\033[35m\n")
+    elif actual_player.game_over == False:
+        print("\033[0m\033[0mWhat possition you want to sweep?")
+        while True:
+            try:
+                inputed_line = int(input("Enter line\n"))
+                inputed_row = int(input("Enter row\n"))
+                print((((inputed_line - 1) * my_grid.rows) + inputed_row - 1))
+                print(len(my_grid.visual_grid))
+                if (((inputed_line - 1) * my_grid.rows) + inputed_row - 1) >= len(my_grid.visual_grid):
+                    print("\033[0m\033[0mYou selected position out of the reach of the grid")
+                    continue
+                elif (((inputed_line - 1) * my_grid.rows) + inputed_row - 1) < 0:
+                    print("\033[0m\033[0mYou selected position out of the reach of the grid")
+                    continue
+                elif (((inputed_line - 1) * my_grid.rows) + inputed_row - 1) in actual_player.played_possitions:
+                    print("\033[0m\033[0mThis position has already been revealed.")
+                    continue
+                break
+            except ValueError:
+                print("Input must be number")
+        print("\n")
+        actual_player.input_verification(inputed_row,inputed_line,my_grid.visual_grid,my_grid.rows,my_grid.lines)
+        game()
+    else:
+        return
+game()
