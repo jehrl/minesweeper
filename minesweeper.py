@@ -1,6 +1,5 @@
 import random
-from typing import Self
-
+import time
 
 class Grid:
     def __init__(self, rows, lines, mines,):
@@ -11,8 +10,6 @@ class Grid:
         self.play_grid = []
         self.visual_grid = []
     def create_grid(self):
-        for grid_possition in range(self.possitions):
-            grid.append(grid_possition)
         mines_possitions = random.sample(range(1,(self.possitions + 1)), self.mines)
         for play_possition in range(1,(self.possitions + 1)):
             if play_possition in mines_possitions:
@@ -61,6 +58,10 @@ class Player:
             else:   
                 self.actual_visual_grid.append(item)
         return
+    def player_actual_grid(self, grid):
+        for item in grid:
+            self.actual_grid.append(item)
+        return
         
 
     
@@ -77,66 +78,47 @@ my_grid = Grid(rows,lines,mines)
 my_grid.create_grid()
 my_grid.create_visual_grid()
 actual_player.player_visual_grid(my_grid.visual_grid,my_grid.rows, my_grid.lines)
-print(actual_player.actual_visual_grid)
+actual_player.player_actual_grid(my_grid.visual_grid)
+print(actual_player.actual_grid)
 
 print("What possition you want to sweep?")
 inputed_row = int(input("Enter row"))
 inputed_line = int(input("Enter line"))
-def neighbour(inputed_possition,grid):
-        final_neigbours = []
-        neighbors = []
-        possitions.append(inputed_possition)
-        possitions = []
-        for possition in possitions
-            if possition%lines == 0:
-                    neighbors.append(possition-1)
-                    neighbors.append(possition-lines)
-                    neighbors.append(possition-lines-1)
-                    neighbors.append(possition+lines-1)
-                    neighbors.append(possition+lines)
-                elif possition%lines == 1:
-                    neighbors.append(possition+1)
-                    neighbors.append(possition-lines+1)
-                    neighbors.append(possition-lines)
-                    neighbors.append(possition+lines+1)
-                    neighbors.append(possition+lines)
-                else:
-                    neighbors = [possition+1, possition-1, possition+lines+1, possition+lines-1, possition+lines, possition-lines+1, possition-lines-1, possition-lines]                
-            for neighbor in neighbors:
-                if grid[neighbor] == 0:
-                    final_neigbours.append(neighbor)
-                    possitions.append(neighbor)
-                    neighbour()
-                elif 0 not in neighbors:
-                    return 
-                    
-                    
-
-
-
-def input_verification(inputed_row, inputed_line, grid, rows, lines)
-    possition_index = ((inputed_line - 1) * rows) + inputed_row - (rows+1) - inputed_line - 1
+def input_verification(inputed_row, inputed_line, grid, rows, lines):
+    possition_index = (((inputed_line - 1) * rows) + inputed_row - 1)
     possition_value = grid[possition_index]
+    print(possition_index)
+    print(possition_value)
     if type(possition_value) == str:
         actual_player.played_positions.append(possition_index)
-        grid_print()
         print("You blasted mine! Game over")
-    elif grid[possition_value] = 0:
+    elif grid[possition_index] == 0:
         final_neighbors = []
         revealed = []
         revealed.append(possition_index)
-        for possition in revealed:
-            final_neighbors.append(possition)
-            revealed.pop(0)
+        while revealed:
+            print("revealed " + str(revealed))
+            possition = revealed.pop(0)
+            print("reveal" + str(possition))
             neighbors = []
-            if possition % lines == 0:
+            clear_neighbors = []
+            print("possition" + str(possition))
+            if possition % lines + 1 == 0:
                 neighbors = [possition - 1, possition - lines, possition - lines - 1, possition + lines - 1, possition + lines]
-            elif possition % lines == 1:
+            elif possition % lines + 1 == 1:
                 neighbors = [possition + 1, possition - lines + 1, possition - lines, possition + lines + 1, possition + lines]
             else:
                 neighbors = [possition + 1, possition - 1, possition + lines + 1, possition + lines - 1, possition + lines, possition - lines + 1, possition - lines - 1, possition - lines]
-            for neighbor in neighbors:
-                if grid[neighbor] == 0:
+            for clear_neighbor in neighbors:
+                if clear_neighbor < len(grid) and clear_neighbor >= 0:
+                    clear_neighbors.append(clear_neighbor)
+            print(clear_neighbors)
+            for neighbor in clear_neighbors:
+                if grid[neighbor] == 0 and neighbor not in final_neighbors:
                     final_neighbors.append(neighbor)
+                    time.sleep(1)
                     revealed.append(neighbor)
         return final_neighbors
+
+input_verification(inputed_row,inputed_line,my_grid.visual_grid,my_grid.rows,my_grid.lines)
+def updating_visual_grid(zeros, )
