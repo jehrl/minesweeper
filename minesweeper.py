@@ -45,7 +45,9 @@ class Player:
         self.name = name
         self.actual_grid = []
         self.actual_visual_grid = []
-        self.played_positions = []
+        self.played_possitions = []
+
+
     def player_visual_grid(self,grid, rows, lines):
         actual_line = 1
         for row in range(rows + 1):
@@ -53,16 +55,70 @@ class Player:
         for i, item in enumerate(grid):
             if i % lines == 0:
                 self.actual_visual_grid.append(actual_line)
-                self.actual_visual_grid.append(item)
                 actual_line += 1
-            else:   
+                if i in self.played_possitions:
+                    self.actual_visual_grid.append(item)
+                else:
+                    self.actual_visual_grid.append("<>")
+            elif i in self.played_possitions:
                 self.actual_visual_grid.append(item)
+            else:   
+                self.actual_visual_grid.append("<>")
+        print(self.actual_visual_grid)
+        print(self.played_possitions)
+        for i, item in enumerate(self.actual_visual_grid):
+            print(item, end= "\t")
+            if (i+1) % (rows + 1)  == 0:
+                print("\n")
         return
+
     def player_actual_grid(self, grid):
         for item in grid:
             self.actual_grid.append(item)
         return
-        
+    
+
+
+    def input_verification(self,inputed_row, inputed_line, grid, rows, lines):
+        possition_index = (((inputed_line - 1) * rows) + inputed_row - 1)
+        possition_value = grid[possition_index]
+        print(possition_index)
+        print(possition_value)
+        if type(possition_value) == str:
+            actual_player.played_possitions.append(possition_index)
+            actual_player.player_visual_grid(grid,rows,lines)
+            print("You blasted mine! Game over")
+        elif grid[possition_index] == 0:
+            revealed = []
+            revealed.append(possition_index)
+            while revealed:
+                print("revealed " + str(revealed))
+                possition = revealed.pop(0)
+                print("reveal" + str(possition))
+                neighbors = []
+                clear_neighbors = []
+                print("possition" + str(possition))
+                if possition % lines + 1 == 0:
+                    neighbors = [possition - 1, possition - lines, possition - lines - 1, possition + lines - 1, possition + lines]
+                elif possition % lines + 1 == 1:
+                    neighbors = [possition + 1, possition - lines + 1, possition - lines, possition + lines + 1, possition + lines]
+                else:
+                    neighbors = [possition + 1, possition - 1, possition + lines + 1, possition + lines - 1, possition + lines, possition - lines + 1, possition - lines - 1, possition - lines]
+                for clear_neighbor in neighbors:
+                    if clear_neighbor < len(grid) and clear_neighbor >= 0:
+                        clear_neighbors.append(clear_neighbor)
+                print(clear_neighbors)
+                for neighbor in clear_neighbors:
+                    if grid[neighbor] == 0 and neighbor not in self.played_possitions:
+                        self.played_possitions.append(neighbor)
+                        revealed.append(neighbor)
+            actual_player.player_visual_grid(grid,rows,lines)
+        return
+
+
+
+def updating_visual_grid(self):
+    pass
 
     
 
@@ -77,48 +133,11 @@ player_possition = 0
 my_grid = Grid(rows,lines,mines)
 my_grid.create_grid()
 my_grid.create_visual_grid()
-actual_player.player_visual_grid(my_grid.visual_grid,my_grid.rows, my_grid.lines)
 actual_player.player_actual_grid(my_grid.visual_grid)
-print(actual_player.actual_grid)
 
 print("What possition you want to sweep?")
 inputed_row = int(input("Enter row"))
 inputed_line = int(input("Enter line"))
-def input_verification(inputed_row, inputed_line, grid, rows, lines):
-    possition_index = (((inputed_line - 1) * rows) + inputed_row - 1)
-    possition_value = grid[possition_index]
-    print(possition_index)
-    print(possition_value)
-    if type(possition_value) == str:
-        actual_player.played_positions.append(possition_index)
-        print("You blasted mine! Game over")
-    elif grid[possition_index] == 0:
-        final_neighbors = []
-        revealed = []
-        revealed.append(possition_index)
-        while revealed:
-            print("revealed " + str(revealed))
-            possition = revealed.pop(0)
-            print("reveal" + str(possition))
-            neighbors = []
-            clear_neighbors = []
-            print("possition" + str(possition))
-            if possition % lines + 1 == 0:
-                neighbors = [possition - 1, possition - lines, possition - lines - 1, possition + lines - 1, possition + lines]
-            elif possition % lines + 1 == 1:
-                neighbors = [possition + 1, possition - lines + 1, possition - lines, possition + lines + 1, possition + lines]
-            else:
-                neighbors = [possition + 1, possition - 1, possition + lines + 1, possition + lines - 1, possition + lines, possition - lines + 1, possition - lines - 1, possition - lines]
-            for clear_neighbor in neighbors:
-                if clear_neighbor < len(grid) and clear_neighbor >= 0:
-                    clear_neighbors.append(clear_neighbor)
-            print(clear_neighbors)
-            for neighbor in clear_neighbors:
-                if grid[neighbor] == 0 and neighbor not in final_neighbors:
-                    final_neighbors.append(neighbor)
-                    time.sleep(1)
-                    revealed.append(neighbor)
-        return final_neighbors
 
-input_verification(inputed_row,inputed_line,my_grid.visual_grid,my_grid.rows,my_grid.lines)
-def updating_visual_grid(zeros, )
+
+actual_player.input_verification(inputed_row,inputed_line,my_grid.visual_grid,my_grid.rows,my_grid.lines)
