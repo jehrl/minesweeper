@@ -2,49 +2,58 @@ import random
 
 
 class Grid:
-    def __init__(self, possitions, mines,):
-        self.possitions = possitions
+    def __init__(self, rows, lines, mines,):
+        self.possitions = rows * lines
         self.mines = mines
+        self.rows = rows
+        self.lines = lines
         self.play_grid = []
 
     def create_grid(self):
         grid = []
         for grid_possition in range(self.possitions):
             grid.append(grid_possition)
-        mines_possitions = random.sample(range(self.possitions), 10)
-        for play_possition in range(self.possitions):
+        mines_possitions = random.sample(range(1,(self.possitions + 1)), self.mines)
+        for play_possition in range(1,(self.possitions + 1)):
             if play_possition in mines_possitions:
-                self.play_grid.append(-1)
+                self.play_grid.append("*")
             else:
                 self.play_grid.append(play_possition)
         return print(self.play_grid)
     def create_visual_grid(self):
         visual_grid = []
-        for i, cell in enumerate(self.play_grid):
-            if cell == -1:
+        for cell in self.play_grid:
+            print("\n")
+            if type(cell) == str:
                 visual_grid.append(cell)
+                print(cell)
             else:
-                neighbors = [i-11, i-10, i-9, i+9, i+10, i+11]
-                if (i+1)%10 != 0:
-                    neighbors.append(i+1)
-                elif (i-1)%9 != 0:
-                    neighbors.append(i-1)
-                elif (i+9)%10 != 0
-                    neighbors.append(i+9)
-                mine_count = sum(1 for j in neighbors if j >= 0 and j < self.possitions and self.play_grid[j] == -1)
+                neighbors = []
+                if (cell)%self.lines == 0:
+                    neighbors.append(cell-1)
+                    neighbors.append(cell-self.lines)
+                    neighbors.append(cell-self.lines-1)
+                    neighbors.append(cell+self.lines-1)
+                    neighbors.append(cell+self.lines)
+                    print(cell)
+                    print(neighbors)
+                elif (cell)%(self.lines) == 1:
+                    neighbors.append(cell+1)
+                    neighbors.append(cell-self.lines+1)
+                    neighbors.append(cell-self.lines)
+                    neighbors.append(cell+self.lines+1)
+                    neighbors.append(cell+self.lines)
+                    print(cell)
+                    print(neighbors)
+                else:
+                    neighbors = [cell+1, cell-1, cell+self.lines+1, cell+self.lines-1, cell+self.lines, cell-self.lines+1, cell-self.lines-1, cell-self.lines]
+                    print(cell)
+                    print(neighbors)                    
+                mine_count = sum(1 for j in neighbors if j >= 0 and j < self.possitions and type(self.play_grid[j-1]) == str)
+                print(mine_count)
                 visual_grid.append(mine_count)
-        print(visual_grid[0:10])
-        print(visual_grid[10:20])
-        print(visual_grid[20:30])
-        print(visual_grid[30:40])
-        print(visual_grid[40:50])
-        print(visual_grid[50:60])
-        print(visual_grid[60:70])
-        print(visual_grid[70:80])
-        print(visual_grid[80:90])
-        print(visual_grid[90:100])
-        print(visual_grid[40:50])
         return print(visual_grid)
+    
 def game_round(play_grid, line, row):
     next_round_grid = play_grid
     final_position = ((line - 1) * 10) + (row - 1)
@@ -56,6 +65,6 @@ def game_round(play_grid, line, row):
 
 print("Welcome to Minseweeper game")
 
-my_grid = Grid(100,10)
+my_grid = Grid(5,5,5)
 my_grid.create_grid()
 my_grid.create_visual_grid() 
