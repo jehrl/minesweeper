@@ -9,7 +9,8 @@ class Grid:
         self.play_grid = []
         self.visual_grid = []
     def create_grid(self):
-        mines_possitions = random.sample(range(1,(self.possitions + 1)), self.mines)
+        mines_possitions = [25]
+        print(mines_possitions)
         for play_possition in range(1,(self.possitions + 1)):
             if play_possition in mines_possitions:
                 self.play_grid.append("*")
@@ -22,6 +23,8 @@ class Grid:
                 self.visual_grid.append(cell)
             else:
                 neighbors = []
+                mine_count = 0
+                mine_location = []
                 if (cell)%self.lines == 0:
                     neighbors.append(cell-1)
                     neighbors.append(cell-self.lines)
@@ -36,8 +39,16 @@ class Grid:
                     neighbors.append(cell+self.lines)
                 else:
                     neighbors = [cell+1, cell-1, cell+self.lines+1, cell+self.lines-1, cell+self.lines, cell-self.lines+1, cell-self.lines-1, cell-self.lines]
-                mine_count = sum(1 for j in neighbors if j >= 0 and j < self.possitions and type(self.play_grid[j-1]) == str)
+                print(neighbors)
+                for j in neighbors:
+                    print(j)
+                    if j > 0 and j <= self.possitions and type(self.play_grid[j-1]) == str:
+                        mine_count += 1
+                        mine_location.append(j)
                 self.visual_grid.append(mine_count)
+                print(mine_location)
+                print(mine_count)
+                
         return self.visual_grid
 class Player:
     def __init__(self, name):
@@ -50,18 +61,29 @@ class Player:
     def player_visual_grid(self,grid, rows, lines):
         actual_line = 1
         visual_grid = []
-        for row in range(rows + 1):
+        visual_grid.append(" ")
+        for row in range(1,rows + 1):
             visual_grid.append(("\033[36m " +str(row)+ "\033[36m"))
         for i, item in enumerate(grid):
             if i % lines == 0:
                 visual_grid.append(("\033[36m" + str(actual_line) + "\033[36m"))
                 actual_line += 1
                 if i in self.played_possitions:
-                    visual_grid.append((" \033[32m" +str(item) + "\033[32m"))
+                    if type(item) == str:
+                        visual_grid.append(("\033[31m " +str(item)) + "\033[31m")
+                    elif item > 0:
+                        visual_grid.append(("\033[0m " +str(item)) + "\033[0m")
+                    else:
+                        visual_grid.append(("\033[32m " +str(item)) + "\033[32m")                
                 else:
                     visual_grid.append("\033[33m[ ]\033[33m")
             elif i in self.played_possitions:
-                visual_grid.append(("\033[32m " +str(item)) + "\033[32m")
+                if type(item) == str:
+                        visual_grid.append(("\033[31m " +str(item)) + "\033[31m")
+                elif item > 0:
+                    visual_grid.append(("\033[0m " +str(item)) + "\033[0m")
+                else:
+                    visual_grid.append(("\033[32m " +str(item)) + "\033[32m")
             else:   
                 visual_grid.append("\033[33m[ ]\033[33m")
         for i, item in enumerate(visual_grid):
