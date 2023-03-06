@@ -107,9 +107,10 @@ class Player:
                     if clear_neighbor < len(grid) and clear_neighbor >= 0:
                         clear_neighbors.append(clear_neighbor)
                 for neighbor in clear_neighbors:
-                    if grid[neighbor] == 0 and neighbor not in self.played_possitions:
+                    if neighbor not in self.played_possitions:
                         self.played_possitions.append(neighbor)
-                        revealed.append(neighbor)
+                        if grid[neighbor] == 0:
+                            revealed.append(neighbor)
             self.player_visual_grid(grid,rows,lines)
             print("\033[0m\033[0mPossition on row "+ str(inputed_row) + " and line " + str(inputed_line) + " is : " + str(grid[possition_index])+ "\n")
         elif grid[possition_index] > 0:
