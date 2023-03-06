@@ -1,3 +1,6 @@
 This is my first minesweeper game.
 
-Its mady only with random modul.
+Created as final project of Learn Python 3 course on Codecademy.
+
+Its mady only with random module.
+
