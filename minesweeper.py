@@ -9,8 +9,7 @@ class Grid:
         self.play_grid = []
         self.visual_grid = []
     def create_grid(self):
-        mines_possitions = [25]
-        print(mines_possitions)
+        mines_possitions = random.sample(range(1,(self.possitions + 1)), self.mines)
         for play_possition in range(1,(self.possitions + 1)):
             if play_possition in mines_possitions:
                 self.play_grid.append("*")
@@ -23,31 +22,14 @@ class Grid:
                 self.visual_grid.append(cell)
             else:
                 neighbors = []
-                mine_count = 0
-                mine_location = []
-                if (cell)%self.lines == 0:
-                    neighbors.append(cell-1)
-                    neighbors.append(cell-self.lines)
-                    neighbors.append(cell-self.lines-1)
-                    neighbors.append(cell+self.lines-1)
-                    neighbors.append(cell+self.lines)
-                elif (cell)%(self.lines) == 1:
-                    neighbors.append(cell+1)
-                    neighbors.append(cell-self.lines+1)
-                    neighbors.append(cell-self.lines)
-                    neighbors.append(cell+self.lines+1)
-                    neighbors.append(cell+self.lines)
+                if cell % self.lines == 0:
+                    neighbors = [cell - 1, cell - lines, cell - lines - 1, cell + lines - 1, cell + lines]
+                elif cell % self.lines == 1:
+                    neighbors = [cell + 1, cell - lines + 1, cell - lines, cell + lines + 1, cell + lines]
                 else:
                     neighbors = [cell+1, cell-1, cell+self.lines+1, cell+self.lines-1, cell+self.lines, cell-self.lines+1, cell-self.lines-1, cell-self.lines]
-                print(neighbors)
-                for j in neighbors:
-                    print(j)
-                    if j > 0 and j <= self.possitions and type(self.play_grid[j-1]) == str:
-                        mine_count += 1
-                        mine_location.append(j)
+                mine_count = sum(1 for j in neighbors if j > 0 and j <= self.possitions and type(self.play_grid[j-1]) == str)
                 self.visual_grid.append(mine_count)
-                print(mine_location)
-                print(mine_count)
                 
         return self.visual_grid
 class Player:
@@ -173,16 +155,14 @@ my_grid.create_visual_grid()
 actual_player.player_actual_grid(my_grid.visual_grid)
 actual_player.player_visual_grid(my_grid.visual_grid,my_grid.rows,my_grid.lines)
 def game():
-    if (len(actual_player.played_possitions) + my_grid.mines) == (len(my_grid.visual_grid)):
+    if (len(actual_player.played_possitions) + my_grid.mines) == (len(my_grid.visual_grid)) and actual_player.game_over == False:
         return print("\n\033[35mCongatulations!!! You won!\033[35m\n")
     elif actual_player.game_over == False:
         print("\033[0m\033[0mWhat possition you want to sweep?")
         while True:
             try:
-                inputed_line = int(input("Enter line\n"))
                 inputed_row = int(input("Enter row\n"))
-                print((((inputed_line - 1) * my_grid.rows) + inputed_row - 1))
-                print(len(my_grid.visual_grid))
+                inputed_line = int(input("Enter line\n"))
                 if (((inputed_line - 1) * my_grid.rows) + inputed_row - 1) >= len(my_grid.visual_grid):
                     print("\033[0m\033[0mYou selected position out of the reach of the grid")
                     continue
